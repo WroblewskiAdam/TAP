@@ -18,7 +18,6 @@ function [X] = f_ciagla_zlin(t, X)
     end
 
     h0 = h_pp;
-    h0 = 14;
 	h_ = (1/(2*pi*r*h0 - pi*h0^2) + (2*h0-2*r)/(pi*h0^2*(h0-2*r)^2)*(h-h0)) * (Fh +Fc + Fd - alpha*(sqrt(h0) + 1/(2*sqrt(h0))*(h-h0)));
     
     T = (Fh*Th +Fc*Tc + Fd*Td - alpha*sqrt(h)*T) / (((pi*h^2)/3) * (3*r-h));
