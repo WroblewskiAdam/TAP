@@ -1,46 +1,67 @@
-function [h1_out, h2_out] = obiekt_dyskretny(lin, t_sim, h1_0, h2_0, F1_in)
-%stałe
-global C1 C2 alfa1 alfa2
+function [h_out, T_out] = obiekt_dyskretny(t_sim, h_0, T_0, Tp)
+global Fh_in Fc_in Th Tc Td alpha r tau_c tau_h Fd h_pp T_pp
+
 start = 2;
 
-%startowe h1, h2
-h1 = zeros(start+t_sim,1);
-h1(1) = h1_0;
-h2 = zeros(start+t_sim,1);
-h2(1) = h2_0;
+%startowe h, T
+h = zeros(start+t_sim,1);
+h(1) = h_0;
+T = zeros(start+t_sim,1);
+T(1) = T_0;
 
-T = 1;
-tau = 50;
-Fd = 11;
+% Tp = 1;
+
 
 for k=start:start+t_sim
-   if k - tau < 1 || length(F1_in) < 51
-	   F1 = F1_in(1);
+
+   if k - tau_h < 1 || length(Fh_in) < 221
+	   Fh = Fh_in(1);
    else
-	   F1 = F1_in(k-tau);
+	   Fh = Fh_in(k-tau_h);
+   end
+   
+   if k - tau_c < 1 || length(Fc_in) < 171
+	   Fc = Fc_in(1);
+   else
+	   Fc = Fc_in(k-tau_c);
    end
 
-   if h1(k)<= 0
-       h1(k) = 0.0001;
-   end
-   if h2(k)<= 0
-       h2(k) = 0.0001;
-   end
+
+   % if h1(k)<= 0
+   %     h1(k) = 0.0001;
+   % end
+   % if h2(k)<= 0
+   %     h2(k) = 0.0001;
+   % end
 	
-	if lin == 1
-		h1_plin = h1_0;
-		h2_plin = h2_0;
-		h1(k) = (-alfa1 * sqrt(h1_plin) + Fd + F1) / (2*C1*h1_plin) + ...
-            ((alfa1/(4*C1*h1_plin^(3/2))) - ((Fd+F1)/(2*C1*h1_plin^2))) * (h1(k-1) - h1_plin) + T * h1(k-1);
-        h2(k) = (alfa1*sqrt(h1_plin) - alfa2*sqrt(h2_plin)) / (3*C2*h2_plin^2) + ...
-			((alfa1)/(6*C2*sqrt(h1_plin)*h2_plin^2))*(h1(k-1) - h1_plin) + ...
-			((-2*alfa1*sqrt(h1_plin))/(3*C2*h2_plin^3) + (alfa2)/(2*C2*h2_plin^(5/2)))*(h2(k-1) - h2_plin)  + T * h2(k-1);
-    else
-        % nieliniowy
-        h1(k) = ((F1 + Fd - alfa2*sqrt(h1(k-1)))/(2*C1*h1(k-1))) * T + h1(k-1); 
-        h2(k) = ((alfa1*sqrt(h1(k-1)) - alfa2*sqrt(h2(k-1))) / (3*C2*(h2(k-1)^2)))  * T + h2(k-1);
-    end
+
+    h0 = h_pp;
+	h(k) = h(k-1) + Tp * ((1/(2*pi*r*h0 - pi*h0^2) + (2*h0-2*r)/(pi*h0^2*(h0-2*r)^2)*(h(k-1)-h0)) * (Fh +Fc + Fd - alpha*(sqrt(h0) + 1/(2*sqrt(h0))*(h(k-1)-h0))));
+    
+    T(k) = T(k-1) + Tp * ((Fh*Th +Fc*Tc + Fd*Td - alpha*sqrt(h(k-1))*T(k-1)) / (((pi*h(k-1)^2)/3) * (3*r-h(k-1))));
+
+
+	% h1(k) = (-alfa1 * sqrt(h1_plin) + Fd + F1) / (2*C1*h1_plin) + ...
+    %     ((alfa1/(4*C1*h1_plin^(3/2))) - ((Fd+F1)/(2*C1*h1_plin^2))) * (h1(k-1) - h1_plin) + T * h1(k-1);
+    % h2(k) = (alfa1*sqrt(h1_plin) - alfa2*sqrt(h2_plin)) / (3*C2*h2_plin^2) + ...
+	% 	((alfa1)/(6*C2*sqrt(h1_plin)*h2_plin^2))*(h1(k-1) - h1_plin) + ...
+	% 	((-2*alfa1*sqrt(h1_plin))/(3*C2*h2_plin^3) + (alfa2)/(2*C2*h2_plin^(5/2)))*(h2(k-1) - h2_plin)  + T * h2(k-1);
+   
 end
-h1_out = h1(1:end);
-h2_out = h2(1:end);
+h = h';
+T = T';
+h_mod1(1:620) = h_pp; 
+h_mod2 = repelem(h(620:end),Tp);
+h_mod = [h_mod1, h_mod2];
+
+T_mod1(1:620) = T_pp; 
+T_mod2 = repelem(T(620:end),Tp);
+T_mod = [T_mod1, T_mod2];
+
+h_out = h_mod(1:start+t_sim);
+T_out = T_mod(1:start+t_sim);
+
+
+% h_out = h(1:end);
+% T_out = T(1:end);
 end
