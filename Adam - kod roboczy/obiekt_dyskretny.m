@@ -41,27 +41,23 @@ for k=start:start+t_sim
     T(k) = T(k-1) + Tp * ((Fh*Th +Fc*Tc + Fd*Td - alpha*sqrt(h(k-1))*T(k-1)) / (((pi*h(k-1)^2)/3) * (3*r-h(k-1))));
 
 
-	% h1(k) = (-alfa1 * sqrt(h1_plin) + Fd + F1) / (2*C1*h1_plin) + ...
-    %     ((alfa1/(4*C1*h1_plin^(3/2))) - ((Fd+F1)/(2*C1*h1_plin^2))) * (h1(k-1) - h1_plin) + T * h1(k-1);
-    % h2(k) = (alfa1*sqrt(h1_plin) - alfa2*sqrt(h2_plin)) / (3*C2*h2_plin^2) + ...
-	% 	((alfa1)/(6*C2*sqrt(h1_plin)*h2_plin^2))*(h1(k-1) - h1_plin) + ...
-	% 	((-2*alfa1*sqrt(h1_plin))/(3*C2*h2_plin^3) + (alfa2)/(2*C2*h2_plin^(5/2)))*(h2(k-1) - h2_plin)  + T * h2(k-1);
+	
    
 end
-h = h';
-T = T';
-h_mod1(1:620) = h_pp; 
-h_mod2 = repelem(h(620:end),Tp);
-h_mod = [h_mod1, h_mod2];
+% h = h';
+% T = T';
+% h_mod1(1:620) = h_pp; 
+% h_mod2 = repelem(h(620:end),Tp);
+% h_mod = [h_mod1, h_mod2];
+% 
+% T_mod1(1:620) = T_pp; 
+% T_mod2 = repelem(T(620:end),Tp);
+% T_mod = [T_mod1, T_mod2];
+% 
+% h_out = h_mod(1:start+t_sim);
+% T_out = T_mod(1:start+t_sim);
 
-T_mod1(1:620) = T_pp; 
-T_mod2 = repelem(T(620:end),Tp);
-T_mod = [T_mod1, T_mod2];
 
-h_out = h_mod(1:start+t_sim);
-T_out = T_mod(1:start+t_sim);
-
-
-% h_out = h(1:end);
-% T_out = T(1:end);
+h_out = h(1:end);
+T_out = T(1:end);
 end
