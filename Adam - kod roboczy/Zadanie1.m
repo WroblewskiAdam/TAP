@@ -1,6 +1,6 @@
 clear all;
 clc;
-close all;
+% close all;
 
 % stałe
 global Fh_in Fc_in Th Tc Td alpha r tau_c tau_h Fd h_pp T_pp
@@ -20,45 +20,47 @@ T_pp = 38.0978;
 Tp = 20;
 
 % [6 13 20 27 34 41 48]
-for i = [34]
+% [21 23 25 27 29 31 33]
+% [24 25 26 27 28 29 30]
+for i = [24 25 26 27 28 29 30]
     Fc_in(1:400) = 50;
-    Fh_in(1:400) = i;
+    Fh_in(1:400) = 27;
     
     % skok wartości
-    Ts = 16000;
+    Ts = 14000;
     Fc_in(401:Ts) = 50;
     Fh_in(401:Ts) = i;
     
     
     [h, T, t] = obiekt_ciagly(0, Ts, h_pp, T_pp);
     [h_zlin, T_zlin, t_zlin] = obiekt_ciagly(1, Ts, h_pp, T_pp);
-    
-    [h_d, T_d] = obiekt_dyskretny(Ts/Tp, h_pp, T_pp, Tp);
-
-    % figure(1)
+    % [h_d, T_d] = obiekt_dyskretny(Ts/Tp, h_pp, T_pp, Tp);
+    % 
+    % % h = (h - h(1))/7;
+    % figure(11)
     % grid on
     % plot(t,h, 'color','red');
     % title('h ciągłe');
     % legend('h');
     % 
-    % figure(2)
+    % % T = (T - T(1))/7;
+    % figure(22)
     % grid on
     % plot(t,T, 'color','red');
     % title('T ciągłe');
     % legend('T');
 
 
-    % 
-    % % wykresy ciagly - zline
-    % figure(1);
-    % plot(t,h, 'color','red');
-    % hold on;
-    % plot(t_zlin,h_zlin, 'color','blue');
-    % title('ciągłe');
-    % legend('h', 'h-zlin');
-    % grid on;
-    % grid minor;
-    % 
+    % wykresy ciagly - zline
+    figure(1);
+    plot(t,h, 'color','red');
+    hold on;
+    plot(t_zlin,h_zlin, 'color','blue');
+    title('ciągłe');
+    legend('h', 'h-zlin');
+    grid on;
+    grid minor;
+
     % figure(2);
     % plot(t,T, 'color','red');
     % hold on;
@@ -68,23 +70,23 @@ for i = [34]
     % grid on;
     % grid minor;
 
-    %porównanie ciągły - dyskretny
-    discrete_time = 1:Tp:Ts;
-    h_d = h_d(1:length(discrete_time));
-    T_d = T_d(1:length(discrete_time));
-    figure(3)
-    grid on
-    hold on
-    plot(t_zlin,h_zlin, 'color','red');
-    stairs(discrete_time,h_d,'color','blue');
-    title('porównanie ciągłe zlin - dyskretne zlin dla zmiennej h');
-    legend('ciagly-zlin', 'dyskretny-zlin');
-
-    figure(4)
-    grid on
-    hold on
-    plot(t_zlin,T_zlin, 'color','red');
-    stairs(discrete_time, T_d,'color','blue');
-    title('porównanie ciągłe zlin - dyskretne zlin dla zmiennej T');
-    legend('ciagly-zlin', 'dyskretny-zlin');
+    % %porównanie ciągły - dyskretny
+    % discrete_time = 1:Tp:Ts;
+    % h_d = h_d(1:length(discrete_time));
+    % T_d = T_d(1:length(discrete_time));
+    % figure(3)
+    % grid on
+    % hold on
+    % plot(t_zlin,h_zlin, 'color','red');
+    % stairs(discrete_time,h_d,'color','blue');
+    % title('porównanie ciągłe zlin - dyskretne zlin dla zmiennej h');
+    % legend('ciagly-zlin', 'dyskretny-zlin');
+    % 
+    % figure(4)
+    % grid on
+    % hold on
+    % plot(t_zlin,T_zlin, 'color','red');
+    % stairs(discrete_time, T_d,'color','blue');
+    % title('porównanie ciągłe zlin - dyskretne zlin dla zmiennej T');
+    % legend('ciagly-zlin', 'dyskretny-zlin');
 end
