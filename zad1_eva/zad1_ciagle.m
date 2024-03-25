@@ -22,14 +22,8 @@ h0 = 13.5424;
 
 Fc_in(1:400) = 50;
 Fh_in(1:400) = 27;
-Fc_in(400:Ts) = 50;
+Fc_in(400:Ts) = 55;
 Fh_in(400:Ts) = 27;
-
-h = zeros(Ts, 1);
-T = zeros(Ts, 1);
-
-h_lin = zeros(Ts, 1);
-T_lin = zeros(Ts, 1);
 
 [h, T, t] = obiekt_ciagly(0, Ts, h_pp, T_pp);
 [h_lin, T_lin, t_lin] = obiekt_ciagly(1, Ts, h_pp, T_pp);

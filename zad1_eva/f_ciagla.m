@@ -20,5 +20,5 @@ function dx = f_ciagla(t, X)
     end
 
 	dx(1) = (Fh + Fc + Fd - alpha*sqrt(h)) / (2*pi*r*h - pi*h^2);
-    dx(2) = (Fh*Th + Fc*Tc + Fd*Td - alpha*sqrt(h)*T)/(pi*h^2*r + pi*h^3/3)-(Fh + Fc + Fd - alpha*sqrt(h));
+    dx(2) = (Fh*Th + Fc*Tc + Fd*Td - alpha*sqrt(h)*T-(Fh + Fc + Fd - alpha*sqrt(h))*T)/(pi*h^2*r + pi*h^3/3);
 end
