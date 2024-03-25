@@ -30,7 +30,7 @@ skoki_T = [];
 % [6 13 20 27 34 41 48]
 % [21 23 25 27 29 31 33]
 % [24 25 26 27 28 29 30]
-for i = Fh_skoki
+for i = [21 23 25 27 29 31 33]
     Fc_in(1:400) = 50;
     Fh_in(1:400) = 27;
   
@@ -43,15 +43,15 @@ for i = Fh_skoki
     % Fh_in(2*settle_time+1:3*settle_time) = 37;
     % Fh_in(3*settle_time+1:Ts) = 17;
 
-    Fc_in(401:Ts) = i;
-    Fh_in(401:Ts) = 27;
+    Fc_in(401:Ts) = 50;
+    Fh_in(401:Ts) = i;
     
     [h, T, t] = obiekt_ciagly(0, Ts, h_pp, T_pp);
     [h_zlin, T_zlin, t_zlin] = obiekt_ciagly(1, Ts, h_pp, T_pp);
     % [h_d, T_d] = obiekt_dyskretny(Ts/Tp, h_pp, T_pp, Tp);
 
-    skoki_h = [skoki_h, h(end)];
-    skoki_T = [skoki_T, T(end)];
+    % skoki_h = [skoki_h, h(end)];
+    % skoki_T = [skoki_T, T(end)];
     
     % figure(1)
     % subplot(2,1,1)
@@ -83,9 +83,10 @@ for i = Fh_skoki
     % print("rysunki/skoki sterowania Fh - sterowanie.png","-dpng","-r400")
 
 
-
-    % h = (h - h(1))/7;
+    % 
+    % % h = (h - h(1))/7;
     % subplot(2,1,1)
+    % hold on
     % grid on
     % plot(t,h, 'color','red');
     % title('punkt pracy');
@@ -93,6 +94,7 @@ for i = Fh_skoki
     % 
     % % T = (T - T(1))/7;
     % subplot(2,1,2)
+    % hold on
     % grid on
     % plot(t,T, 'color','red');
     % title('punkt pracy');
@@ -101,24 +103,24 @@ for i = Fh_skoki
 
     
 
-    % % wykresy ciagly - zline
-    % figure(1);
-    % plot(t,h, 'color','red');
-    % hold on;
-    % plot(t_zlin,h_zlin, 'color','blue');
-    % title('ciągłe');
-    % legend('h', 'h-zlin');
-    % grid on;
-    % grid minor;
-    % 
-    % figure(2);
-    % plot(t,T, 'color','red');
-    % hold on;
-    % plot(t_zlin,T_zlin, 'color','blue');
-    % title('ciągłe');
-    % legend('T', 'Tzlin');
-    % grid on;
-    % grid minor;
+    % wykresy ciagly - zline
+    figure(1);
+    plot(t,h, 'color','red');
+    hold on;
+    plot(t_zlin,h_zlin, 'color','blue');
+    title('ciągłe');
+    legend('h', 'h-zlin');
+    grid on;
+    grid minor;
+
+    figure(2);
+    plot(t,T, 'color','red');
+    hold on;
+    plot(t_zlin,T_zlin, 'color','blue');
+    title('ciągłe');
+    legend('T', 'Tzlin');
+    grid on;
+    grid minor;
 
     % %porównanie ciągły - dyskretny
     % discrete_time = 1:Tp:Ts;
@@ -141,23 +143,23 @@ for i = Fh_skoki
     % legend('ciagly-zlin', 'dyskretny-zlin');
 end
 
-figure(1)
-hold on
-plot(Fh_skoki,skoki_h, 'color','red');
-title('Charakterystyka statyczna toru Fd - h');
-xlabel('Fc')
-ylabel('h')
-grid on;
-print("rysunki/char_stat toru Fd-h.png","-dpng","-r400")
-
-
-figure(2)
-hold on
-plot(Fh_skoki,skoki_T, 'color','red');
-title('Charakterystyka statyczna toru Fd - T');
-xlabel('Fc')
-ylabel('T')
-grid on;
-print("rysunki/char_stat toru Fd-T.png","-dpng","-r400")
+% figure(1)
+% hold on
+% plot(Fh_skoki,skoki_h, 'color','red');
+% title('Charakterystyka statyczna toru Fd - h');
+% xlabel('Fc')
+% ylabel('h')
+% grid on;
+% print("rysunki/char_stat toru Fd-h.png","-dpng","-r400")
+% 
+% 
+% figure(2)
+% hold on
+% plot(Fh_skoki,skoki_T, 'color','red');
+% title('Charakterystyka statyczna toru Fd - T');
+% xlabel('Fc')
+% ylabel('T')
+% grid on;
+% print("rysunki/char_stat toru Fd-T.png","-dpng","-r400")
 
 
