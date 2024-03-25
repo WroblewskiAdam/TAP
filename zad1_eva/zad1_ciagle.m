@@ -22,29 +22,34 @@ h0 = 13.5424;
 
 Fc_in(1:400) = 50;
 Fh_in(1:400) = 27;
-Fc_in(400:Ts) = 55;
 Fh_in(400:Ts) = 27;
 
-[h, T, t] = obiekt_ciagly(0, Ts, h_pp, T_pp);
-[h_lin, T_lin, t_lin] = obiekt_ciagly(1, Ts, h_pp, T_pp);
+Fcins = [30 40 50 60 70];
 
+for i=1:length(Fcins)
+    
+    Fc_in(400:Ts) = Fcins(i);
 
-subplot(2,1,1)
-stairs(h, "m");
-hold on
-subplot(2,1,2)
-stairs(T, "m");
-hold on
+    [h, T, t] = obiekt_ciagly(0, Ts, h_pp, T_pp);
+    [h_lin, T_lin, t_lin] = obiekt_ciagly(1, Ts, h_pp, T_pp);
 
-subplot(2,1,1)
-stairs(h_lin, "b");
-xlabel("t"); ylabel("h");
-title("Przebieg h");
-legend("nlin", "lin")
-hold on
-subplot(2,1,2)
-stairs(T_lin, "b");
-xlabel("t"); ylabel("T");
-title("Przebieg T");
-legend("nlin", "lin")
-hold on
+    subplot(2,1,1)
+    stairs(h, "m");
+    hold on
+    subplot(2,1,2)
+    stairs(T, "m");
+    hold on
+
+    subplot(2,1,1)
+    stairs(h_lin, "b");
+    xlabel("t"); ylabel("h");
+    title("Przebieg h");
+    legend("nlin", "lin")
+    hold on
+    subplot(2,1,2)
+    stairs(T_lin, "b");
+    xlabel("t"); ylabel("T");
+    title("Przebieg T");
+    legend("nlin", "lin")
+    hold on
+end
