@@ -19,7 +19,7 @@ h_pp = 13.5424;
 T_pp = 38.0978;
 % 38.0978260869565
 
-Tp = 20;
+Tp = 200;
 
 Ts = 8000;
 Fc_skoki = 20:1:80;
@@ -30,7 +30,10 @@ skoki_T = [];
 % [6 13 20 27 34 41 48]
 % [21 23 25 27 29 31 33]
 % [24 25 26 27 28 29 30]
-for i = [21 23 25 27 29 31 33]
+% [35 40 45 50 55 60 65]
+% [44 46 48 50 52 54 56]
+% [25.5 26 26.5 27.5 28 29.5]
+for i = [24 25 26 27 28 29 30]
     Fc_in(1:400) = 50;
     Fh_in(1:400) = 27;
   
@@ -48,7 +51,7 @@ for i = [21 23 25 27 29 31 33]
     
     [h, T, t] = obiekt_ciagly(0, Ts, h_pp, T_pp);
     [h_zlin, T_zlin, t_zlin] = obiekt_ciagly(1, Ts, h_pp, T_pp);
-    % [h_d, T_d] = obiekt_dyskretny(Ts/Tp, h_pp, T_pp, Tp);
+    [h_d, T_d] = obiekt_dyskretny(Ts/Tp, h_pp, T_pp, Tp);
 
     % skoki_h = [skoki_h, h(end)];
     % skoki_T = [skoki_T, T(end)];
@@ -66,8 +69,8 @@ for i = [21 23 25 27 29 31 33]
     % grid on
     % legend('T');
     % print("rysunki/skoki sterowania Fh - przebiegi.png","-dpng","-r400")
-    % 
-    % 
+    
+    
     % figure(2)
     % subplot(2,1,1)
     % plot(t,Fc_in, 'Color','blue');
@@ -83,23 +86,27 @@ for i = [21 23 25 27 29 31 33]
     % print("rysunki/skoki sterowania Fh - sterowanie.png","-dpng","-r400")
 
 
-    % 
-    % % h = (h - h(1))/7;
-    % subplot(2,1,1)
+    % % % 
+    % % % % % h = (h - h(1))/7;
+    % % % subplot(2,1,1)
+    % figure(1)
     % hold on
     % grid on
     % plot(t,h, 'color','red');
     % title('punkt pracy');
     % legend('h');
+    % % % axis([0 8000 13 14])
     % 
     % % T = (T - T(1))/7;
-    % subplot(2,1,2)
+    % % subplot(2,1,2)
+    % figure(2)
     % hold on
     % grid on
     % plot(t,T, 'color','red');
     % title('punkt pracy');
     % legend('T');
-    % print("rysunki/pkt_pracy.png","-dpng","-r400")
+    % % print("rysunki/pkt_pracy.png","-dpng","-r400")
+    % % axis([0 8000 37.9 38.2])
 
     
 
@@ -126,6 +133,7 @@ for i = [21 23 25 27 29 31 33]
     % discrete_time = 1:Tp:Ts;
     % h_d = h_d(1:length(discrete_time));
     % T_d = T_d(1:length(discrete_time));
+
     % figure(3)
     % grid on
     % hold on

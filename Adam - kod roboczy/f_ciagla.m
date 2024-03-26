@@ -18,7 +18,9 @@ function [X] = f_ciagla(t, X)
     end
 
 	h_ = (Fh +Fc + Fd - alpha*sqrt(h)) / (2*pi*r*h - pi*h^2);
-    T = (Fh*Th +Fc*Tc + Fd*Td - alpha*sqrt(h)*T) / (((pi*h^2)/3) * (3*r-h));
+  
+    T = (Fh*Th + Fc*Tc + Fd*Td - alpha*sqrt(h)*T-(Fh + Fc + Fd - alpha*sqrt(h))*T)/(pi*h^2*r + pi*h^3/3);
+
     X = [h_; T];
     
 end
