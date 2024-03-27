@@ -19,14 +19,21 @@ syms h T Fh Fc
 
 % rownania stanu
 h0 = h_pp;
-Fh0 = 50;
-Fc0 = 27;
+T0 = T_pp;
+Fh0 = 27;
+Fc0 = 50;
 
-eqn1_sym = (Fh0 +Fc0 + Fd - alpha*sqrt(h0)) / (2*pi*r*h0 - pi*h0^2) + ...
-         ((3*alpha*h0^(3/2) - 2*alpha*sqrt(h0)*r + 4*Fc0*(h0-r) + 4*Fd*(h0-r) + 4*h0*Fh0 - 4*Fh0*r) / (2*pi*h0^2*(h0-2*r)^2)) * (h-h0) + ...
-         (1/(2*pi*h0*r - pi*h0^2))*(Fh - Fh0) + ...
-         (1/(2*pi*h0*r - pi*h0^2))*(Fc - Fc0);
-eqn2_sym = (Fh*Th + Fc*Tc + Fd*Td - alpha*sqrt(h)*T) / (((pi*h^2)/3) * (3*r-h));
+eqn1_sym = (Fh0 +Fc0 + Fd - alpha*sqrt(h0)) / (2*pi*r*h0 - pi*h0^2) - ...
+         ((alpha*sqrt(h0)*(3*h0-2*r) - 4*(h0-r)*(Fc0+Fh0+Fd)) / (2*pi*h0^2*(h0-2*r)^2)) * (h-h0) + ...
+         (1/(2*pi*r*h0 - pi*h0^2))*(Fh - Fh0) + ...
+         (1/(2*pi*r*h0 - pi*h0^2))*(Fc - Fc0);
+
+
+eqn2_sym = (Fh0*Th + Fc0*Tc + Fd*Td - alpha*sqrt(h0)*T0 - T0*(Fh0 + Fc0 + Fd - alpha*sqrt(h0))) / (pi*h0^2*r - (pi*h0^3)/3) + ...
+        (3*(Fc0 + Fh0 + Fd) / (pi*h0^2*(h0-3*r))) * (T - T0) + ...
+        (3*(T0 - Th) / (pi*h0^2*(h0-3*r))) * (Fh - Fh0) + ...
+        (3*(T0 - Tc) / (pi*h0^2*(h0-3*r))) * (Fc - Fc0) + ...
+        ((9*(h0-2*r) * (Fc0*(Tc - T0) + Fh0*(Th-T0) + Fd*(Td-T0))) / (pi*h0^3*(h0 - 3*r)^2)) * (h - h0);
 
 % macierz jacobiego dla stanow
 J_A = jacobian([eqn1_sym, eqn2_sym], [h, T]);
@@ -54,3 +61,21 @@ title('Odpowiedź skokowa modelu przestrzeni stanów');
 figure;
 step(G);
 title('Odpowiedź skokowa transmitancji');
+
+Tp = 200; % poczatkowy okres probkowania
+metoda = 'zoh'; 
+
+% petla dla roznych Tp
+for i = 1:5
+
+    % dyskretyzacja
+    G_d = c2d(G, Tp, metoda);
+
+    % odpowiedz skokowa
+    figure(i); 
+    step(G, G_d);
+    title(['Odpowiedź skokowa dla Tp = ', num2str(Tp), 's']);
+    legend('Transmitancja ciągła', ['Transmitancja dyskretna, Tp = ', num2str(Tp), 's']);
+    
+    Tp = Tp / 10;
+end
