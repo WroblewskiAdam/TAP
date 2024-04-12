@@ -5,16 +5,16 @@ function [X] = f_ciagla_zlin(t, X)
     T = X(2,:);
 
 
-    if floor(t) - tau_h < 1
+    if round(t) - tau_h < 1
 		Fh = Fh_in(1);
 	else
-    	Fh = Fh_in(floor(t) - tau_h);
+    	Fh = Fh_in(round(t) - tau_h);
     end
     
-    if floor(t) - tau_c < 1
+    if round(t) - tau_c < 1
 		Fc = Fc_in(1);
 	else
-    	Fc = Fc_in(floor(t) - tau_c);
+    	Fc = Fc_in(round(t) - tau_c);
     end
 
     h0 = h_pp;
