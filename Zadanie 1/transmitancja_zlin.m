@@ -1,3 +1,4 @@
+function [G, G_d] = transmitancja(Tp, metoda)
 % zmienne
 global Th Tc Td alpha r tau_c tau_h Fd
 
@@ -69,16 +70,27 @@ Tp = 200; % poczatkowy okres probkowania
 metoda = 'zoh'; 
 
 % petla dla roznych Tp
-for i = 1:5
+for i = 1:4
 
     % dyskretyzacja
+    sys_d = c2d(sys_ss, Tp, metoda);
     G_d = c2d(G, Tp, metoda);
 
     % odpowiedz skokowa
     figure(i); 
-    step(G, G_d);
+    step(sys_d, G_d);
     title(['Odpowiedź skokowa dla Tp = ', num2str(Tp), 's']);
-    legend('Transmitancja ciągła', ['Transmitancja dyskretna, Tp = ', num2str(Tp), 's']);
+    legend('Model przestrzeni stanów', ['Transmitancja dyskretna, Tp = ', num2str(Tp), 's']);
+    filename = ['trans-sys-dys-tp', num2str(Tp), '.png'];
+    print(filename, '-dpng', '-r400');
+
+    % figure(i); 
+    % step(G, G_d);
+    % title(['Odpowiedź skokowa dla Tp = ', num2str(Tp), 's']);
+    % legend('Transmitancja ciągła', ['Transmitancja dyskretna, Tp = ', num2str(Tp), 's']);
+    % filename = ['trans-ciag-dys-tp', num2str(Tp), '.png'];
+    % print(filename, '-dpng', '-r400');
     
-    Tp = Tp / 10;
+    Tp = Tp / 2;
+end
 end
