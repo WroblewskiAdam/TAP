@@ -21,23 +21,23 @@ T_pp = 38.0978;
 r = 68;
 alpha = 25;
 
-Tp = 50 ; % czas próbkowania
+Tp = 10 ; % czas próbkowania
 Ts = 8000; % czas symulacji
 
 %wartości początkowe
 Fc_in(1:400) = 50;
 Fh_in(1:400) = 27;
 
-sterowanie = "Fc";
+sterowanie = "Fh";
 if sterowanie == "Fc"
-    % skoki = [25 30 35 40 45 50 55 60 65 70 75];
+    skoki = [25 30 35 40 45 50 55 60 65 70 75];
     % skoki = [44 46 48 50 52 54 56];
     % skoki  = [49 49.5 50 50.5 51]
-    skoki = [40];
+    % skoki = [40];
 else
     % skoki = [21 23 25 27 29 31 33];
-    % skoki = [6 13 20 27 34 41 48];
-    skoki = [34];
+    skoki = [6 13 20 27 34 41 48];
+    % skoki = [34];
 end
 
 % interval = 10000;
@@ -103,9 +103,9 @@ for i = skoki
     hold on
     plot(t_zlin, h_zlin, 'color','red');
     stairs(discrete_time,h_d,'color','blue');
-    title('Porównanie modeli liniowych ciągłego i dyskretnego dla zmiennej h', 'skoki sterowania Fh');
+    title('Porównanie modeli liniowych ciągłego i dyskretnego dla zmiennej h', 'skoki sterowania Fh, Tp = 10');
     legend('ciagly', 'dyskretny');
-    % print("rysunki/dyskretny-h-skoki-Fh.png","-dpng","-r400")
+    print("rysunki/dyskretny-h-skoki-Fh.png","-dpng","-r400")
 
 
     figure(6)
@@ -113,9 +113,9 @@ for i = skoki
     hold on
     plot(t_zlin, T_zlin, 'color','red');
     stairs(discrete_time, T_d,'color','blue');
-    title('Porównanie modeli liniowych ciągłego i dyskretnego dla zmiennej T','skoki sterowania Fh');
+    title('Porównanie modeli liniowych ciągłego i dyskretnego dla zmiennej T','skoki sterowania Fh, Tp = 10');
     legend('ciagly', 'dyskretny');
-    % print("rysunki/dyskretny-T-skoki-Fh.png","-dpng","-r400")
+    print("rysunki/dyskretny-T-skoki-Fh.png","-dpng","-r400")
 end
 
 % %% Symulacja nieliniowego - punkt pracy 

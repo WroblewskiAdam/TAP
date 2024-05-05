@@ -1,0 +1,1 @@
+load("macierz_M.mat")
