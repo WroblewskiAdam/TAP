@@ -43,6 +43,6 @@ function [h_out, T_out] = obiekt_dyskretny(t_sim, h_0, T_0, Tp)
             (3*(T0 - Tc) / (pi*h0^2*(h0-3*r))) * (Fc - Fc0) + ...
             ((9*(h0-2*r) * (Fc0*(Tc - T0) + Fh0*(Th-T0) + Fd*(Td-T0))) / (pi*h0^3*(h0 - 3*r)^2)) * (h(k-1) - h0));
     end
-    h_out = h(1:end);
-    T_out = T(1:end);
+    h_out = h(1);
+    T_out = T(1);
 end

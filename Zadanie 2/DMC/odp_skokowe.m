@@ -21,23 +21,18 @@ T_pp = 38.0978;
 r = 68;
 alpha = 25;
 
-Tp = 1 ; % czas próbkowania
+Tp = 25 ; % czas próbkowania
 Ts = 16000; % czas symulacji
 
-%wartości początkowe
-Fc_in(1:400) = 50;
-Fh_in(1:400) = 27;
-
-Fh_in(2:Ts) = 27;
-Fc_in(2:Ts) = 50;
+u1(1:Ts) = 27;
+u2(2:Ts) = 50;
 
 odpowiedzi = cell(2, 1);
 odp_h = cell(1,2);
 odp_T = cell(1,2);
 
-i=1;
-
-if i == 1
+i="Fh";
+if i == "Fc"
     Fc_in(2:Ts) = 75;
 else
     Fh_in(2:Ts) = 41;
@@ -60,7 +55,7 @@ grid on
 hold on
 stairs(discrete_time, T_d,'color','blue');
 
-if i == 1
+if i == "Fc"
     h_skal = (h_d - h_d(1))/(Fc_in(2) - Fc_in(1));
     T_skal = (T_d - T_d(1))/(Fc_in(2) - Fc_in(1));
 else
@@ -79,6 +74,6 @@ hold on
 stairs(discrete_time, T_skal,'color','blue');
 
 
-odpowiedzi_skok_Fc = [h_skal, T_skal];
-% save odpowiedzi_skok_Fc.mat odpowiedzi_skok_Fc
+odpowiedzi_skok_Fh = [h_skal, T_skal];
+save odpowiedzi_skok_Fh_Tp25.mat odpowiedzi_skok_Fh
 

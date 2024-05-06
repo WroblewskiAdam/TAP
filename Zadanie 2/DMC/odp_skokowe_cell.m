@@ -1,5 +1,5 @@
-% load("odpowiedzi_skok_Fc.mat")
-% load("odpowiedzi_skok_Fh.mat")
+% load("odpowiedzi_skok_Fc_Tp25.mat")
+% load("odpowiedzi_skok_Fh_Tp25.mat")
 % 
 % odpowiedzi = cell(2,1);
 % odp_y1_h = cell(1,2);
@@ -14,31 +14,31 @@
 % 
 % odpowiedzi{1} = odp_y1_h;
 % odpowiedzi{2} = odp_y2_T;
-% save odpowiedzi_skokowe.mat odpowiedzi
+% save odpowiedzi_skokowe_Tp25.mat odpowiedzi
 
 
-load("odpowiedzi_skokowe.mat")
-figure(1)
-subplot(2,2,1)
-stairs(odpowiedzi{1}{1})
-title("Skok Fh",'fontsize',10)
-ylabel("wyj h",'fontweight','bold','fontsize',10)
-set(get(gca,'ylabel'),'rotation',0)
+% load("odpowiedzi_skokowe_Tp10.mat")
+% figure(1)
+% subplot(2,2,1)
+% stairs(odpowiedzi{1}{1})
+% title("Skok Fh",'fontsize',10)
+% ylabel("wyj h",'fontweight','bold','fontsize',10)
+% set(get(gca,'ylabel'),'rotation',0)
+% 
+% 
+% subplot(2,2,2)
+% stairs(odpowiedzi{1}{2})
+% title("Skok Fc",'fontsize',10)
+% 
+% subplot(2,2,3)
+% stairs(odpowiedzi{2}{1})
+% set(get(gca,'ylabel'),'rotation',0)
+% ylabel("wyj T",'fontweight','bold','fontsize',10)
+% 
+% subplot(2,2,4)
+% stairs(odpowiedzi{2}{2})
 
-
-subplot(2,2,2)
-stairs(odpowiedzi{1}{2})
-title("Skok Fc",'fontsize',10)
-
-subplot(2,2,3)
-stairs(odpowiedzi{2}{1})
-set(get(gca,'ylabel'),'rotation',0)
-ylabel("wyj T",'fontweight','bold','fontsize',10)
-
-subplot(2,2,4)
-stairs(odpowiedzi{2}{2})
-
-print("rysunki/odpowiedzi skokowe.png","-dpng","-r800")
+% print("rysunki/odpowiedzi skokowe.png","-dpng","-r800")
 
 
 % figure(2)
