@@ -1,7 +1,5 @@
 function [e, T_out, h_out, T_zad, h_zad, Fc_in, Fh_in] = PID(p)
 
-% aby uzyc PID_optymalizacja zamienic na function [e] = PID(p)
-
 Kp1 = p(1);
 Ki1 = p(2);
 Kd1 = p(3);
@@ -87,23 +85,21 @@ for k = k_min:k_max
     e = e + abs(e1(k)) + abs(e2(k));
 end
 
-% disp(e)
+figure(1)
+hold on
+plot(T_out(k_min:k_max))
+plot(T_zad(k_min:k_max))
+plot(h_out(k_min:k_max))
+plot(h_zad(k_min:k_max))
+hold off
+legend(["T_{out}", "Tzad", "h_{out}", "hzad"])
 
-% figure(1)
-% hold on
-% plot(T_out(k_min:k_max))
-% plot(T_zad(k_min:k_max))
-% plot(h_out(k_min:k_max))
-% plot(h_zad(k_min:k_max))
-% hold off
-% legend(["T_{out}", "Tzad", "h_{out}", "hzad"])
-% 
-% figure(2)
-% hold on
-% plot(Fc_in(k_min:k_max))
-% plot(Fh_in(k_min:k_max))
-% hold off
-% legend(["Fc_{in}", "Fh_{in}"])
+figure(2)
+hold on
+plot(Fc_in(k_min:k_max))
+plot(Fh_in(k_min:k_max))
+hold off
+legend(["Fc_{in}", "Fh_{in}"])
 
 end
 
