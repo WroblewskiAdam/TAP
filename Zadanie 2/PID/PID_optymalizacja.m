@@ -3,10 +3,10 @@ close all;
 clc;
 
 % dolne ograniczenia
-lb = [-4, -4, 0, -4, -4, 0];
+lb = [-3, -2, -3, -2, -2 -2];
 
 % gorne ograniczenia
-ub = [4, 2, 4, 4, 2, 4];
+ub = [2, 2, 2, 2, 2, 2];
 
 % poczatkowe parametry
 start_params = [-1.5, 0, 0, 1.5, 0, 0];

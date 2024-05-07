@@ -1,5 +1,5 @@
 function [e, T_out, h_out, T_zad, h_zad, Fc_in, Fh_in] = PID(p)
-
+% function [e] = PID(p)
 % aby uzyc PID_optymalizacja zamienic na function [e] = PID(p)
 
 Kp1 = p(1);
@@ -55,6 +55,8 @@ T_zad(1:round(k_max/3)) = T_pp;
 T_zad(round(k_max/3+1):round(2*k_max/3)) = T_pp + 5;
 T_zad(round(2*k_max/3+1):k_max) = T_pp - 5;
 
+u1 = Fc_in;
+u2 = Fh_in;
 
 e1(1:k_max) = 0;
 e2(1:k_max) = 0;
@@ -72,6 +74,8 @@ for k = k_min:k_max
 
     [h_out, T_out] = obiekt_dyskretny_pid(Ts, h(1), T(1), Tp);
 
+    %% bez odsprzegania
+
     e1(k) = T_zad(k) - T_out(k-1);
     Fc_in(k) = Fc_in(k-1) + r0_1*e1(k) - r1_1*e1(k-1) + r2_1*e1(k-2);
     if Fc_in(k) < 0
@@ -85,6 +89,33 @@ for k = k_min:k_max
     end
 
     e = e + abs(e1(k)) + abs(e2(k));
+
+    %% z odsprzeganiem
+
+    % u1(k) = Fc_in(k) + Fh_in(k);
+    % u2(k) = Fh_in(k) - Fc_in(k);
+    % 
+    % if u1(k) < 0
+    %     u1(k) = 0;
+    % end
+    % 
+    % if u2(k) < 0
+    %     u2(k) = 0;
+    % end
+    % 
+    % e1(k) = T_zad(k) - T_out(k-1);
+    % u1(k) = u1(k-1) + r0_1*e1(k) - r1_1*e1(k-1) + r2_1*e1(k-2);
+    % if u1(k) < 0
+    %     u1(k) = 0;
+    % end
+    % 
+    % e2(k) = h_zad(k) - h_out(k-1);
+    % u2(k) = u2(k-1) + r0_2*e2(k) - r1_2*e2(k-1) + r2_2*e2(k-2);
+    % if u2(k) < 0
+    %     u2(k) = 0;
+    % end
+    % 
+    % e = e + abs(e1(k)) + abs(e2(k));
 end
 
 % disp(e)
