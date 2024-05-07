@@ -1,6 +1,6 @@
-clear all;
-close all;
-clc;
+% clear all;
+% close all;
+% clc;
 
 global Fh_in Fc_in Th Tc Td alpha r tau_c tau_h Fd h_pp T_pp
 r = 68;
@@ -29,8 +29,13 @@ tau_h_steps = round(220 / Tp);
 k_min = 1 + max(tau_c_steps, tau_h_steps);
 k_max = steps;  
 
-% p = [-1.9994   -0.0850   -1.8661    1.8631    0.0037    1.6647];
-p = [-2.9998   -0.0070   -2.6678    1.9996    0.0027    1.9287];
+%% bez odsprzegania
+% p = [-2.9998   -0.0070   -2.6678    1.9996    0.0027    1.9287];
+% p = [-2.9971   -0.0056   -2.4035    1.9992   -0.0007    1.8559];
+d
+
+%% z odsprzeganiem
+% p = [-2.9997   -0.0125   -2.8313    1.5593    0.0056    1.9343];
 
 [e, T_out, h_out, T_zad, h_zad, Fc_in, Fh_in] = PID(p);
 

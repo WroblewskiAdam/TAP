@@ -1,4 +1,4 @@
-function [h_out, T_out] = obiekt_dyskretny_pid(t_sim, h_0, T_0, Tp)
+function [h_out, T_out] = obiekt_dyskretny_pid(t_sim, h_0, T_0, Tp, Fd, Td)
 global Fh_in Fc_in Th Tc Td alpha r tau_c tau_h Fd h_pp T_pp
 
 steps = round(t_sim/Tp);

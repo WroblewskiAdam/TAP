@@ -39,8 +39,8 @@ k_min = 1 + max(tau_c_steps, tau_h_steps);
 k_max = steps;  
 
 % warunki poczatkowe
-Fc_in = zeros(1, k_max + tau_c_steps);
-Fh_in = zeros(1, k_max + tau_h_steps);
+Fc_in = Fc * ones(1, k_max + tau_c_steps);
+Fh_in = Fh * ones(1, k_max + tau_h_steps);
 
 h = h_pp * ones(1, k_max);
 T = T_pp * ones(1, k_max);
@@ -55,8 +55,11 @@ T_zad(1:round(k_max/3)) = T_pp;
 T_zad(round(k_max/3+1):round(2*k_max/3)) = T_pp + 5;
 T_zad(round(2*k_max/3+1):k_max) = T_pp - 5;
 
-u1 = Fc_in;
-u2 = Fh_in;
+% k_ht = -0.1;  % wplyw T na h
+% k_th = -0.054; % wplyw h na T 
+
+k_ht = -0.1;  % wplyw T na h
+k_th = -0.054; % wplyw h na T 
 
 e1(1:k_max) = 0;
 e2(1:k_max) = 0;
@@ -72,7 +75,22 @@ r2_2 = Kd2 / Tp;
 
 for k = k_min:k_max
 
-    [h_out, T_out] = obiekt_dyskretny_pid(Ts, h(1), T(1), Tp);
+    if k < round(k_max/3)
+        Fd = 0;
+        Td = 0;
+    end
+
+    if k > round(k_max/3)-1 && k < round(2*k_max/3)
+       Fd = 15;
+       Td = 42;
+    end
+
+    if k > round(2*k_max/3)-1
+       Fd = 25;
+       Td = 30;
+    end
+
+    [h_out, T_out] = obiekt_dyskretny_pid(Ts, h(1), T(1), Tp, Fd, Td);
 
     %% bez odsprzegania
 
@@ -92,27 +110,17 @@ for k = k_min:k_max
 
     %% z odsprzeganiem
 
-    % u1(k) = Fc_in(k) + Fh_in(k);
-    % u2(k) = Fh_in(k) - Fc_in(k);
-    % 
-    % if u1(k) < 0
-    %     u1(k) = 0;
-    % end
-    % 
-    % if u2(k) < 0
-    %     u2(k) = 0;
-    % end
-    % 
     % e1(k) = T_zad(k) - T_out(k-1);
-    % u1(k) = u1(k-1) + r0_1*e1(k) - r1_1*e1(k-1) + r2_1*e1(k-2);
-    % if u1(k) < 0
-    %     u1(k) = 0;
+    % Fc_in(k) = Fc_in(k-1) + r0_1*e1(k) - r1_1*e1(k-1) + r2_1*e1(k-2) - k_ht * e2(k);
+    % 
+    % if Fc_in(k) < 0
+    %     Fc_in(k) = 0;
     % end
     % 
     % e2(k) = h_zad(k) - h_out(k-1);
-    % u2(k) = u2(k-1) + r0_2*e2(k) - r1_2*e2(k-1) + r2_2*e2(k-2);
-    % if u2(k) < 0
-    %     u2(k) = 0;
+    % Fh_in(k) = Fh_in(k-1) + r0_2*e2(k) - r1_2*e2(k-1) + r2_2*e2(k-2) - k_th * e1(k);
+    % if Fh_in(k) < 0
+    %     Fh_in(k) = 0;
     % end
     % 
     % e = e + abs(e1(k)) + abs(e2(k));
