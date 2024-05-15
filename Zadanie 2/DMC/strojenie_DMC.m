@@ -1,60 +1,59 @@
-function [e] = strojenie_DMC(wektor)
+function [Error] = strojenie_DMC(wektor)
+disp(wektor)
+% parametry DMC
+% D = 200;
+% N = 200;
+% Nu = 50;
+% lambda = [50, 50];
+% phi = [1, 1];
 
-
-lambda1 = 1;
-lambda2 = 1;
-% lambda1 = wektor(1);
-% lambda2 = wektor(2);
-phi1 = wektor(1);
-phi2 = wektor(2);
-
-
-% function [E, h1, h2, h2_zad, F1, Fd]=DMC(wektor, zaklocenia, rysowanie)
-
-% clear all
-% close all
-
-Tp = 10;% Krok symulacji (sekundy)
-D = 100;
-
-start = D+1;
-simulation_time = 10000; % Czas symulacji (sekundy)
-poczatek = start; %chwila k w której zmienia sie wartość zadana
-N = 50;
-Nu = 20;
+D = wektor(1);
+N = wektor(2);
+if N>D
+    N = D;
+end
+Nu = N;
+lambda1 = wektor(3);
+lambda2 = wektor(4);
+phi1 = wektor(5);
+phi2 = wektor(6);
 lambda = [lambda1, lambda2];
 phi = [phi1, phi2];
 
+
+% parametry symulacji 
+Tp = 10;
+start = D+1;
+simulation_time = 10000; 
+Error = 0;
+
 % Stałe
 alpha = 25;
-tau_C = 170;
-tau_H = 220;
+tau_c = 170;
+tau_h = 220;
 r = 68;
 
+Fc_max = 100;
+Fh_max = 54;
 
-% Punkt pracy - wejścia procesu
-T_Cpp = 17;
-T_Hpp = 75;
-T_Dpp = 42;
-F_Cpp = 50;
-F_Hpp = 27;
-F_Dpp = 15;
+% Punkt pracy 
+Tc_pp = 17;
+Th_pp = 75;
+Td_pp = 42;
+Fc_pp = 50;
+Fh_pp = 27;
+Fd_pp = 15;
 
-% Punkt pracy - wyjścia procesu
 h_pp = 13.5424;
 T_pp = 38.0978;
 
-tau_H_steps = tau_H / Tp;
-tau_C_steps = tau_C / Tp;
+% trajektorie
+Fh_in(1:simulation_time) = Fh_pp;
+Fc_in(1:simulation_time) = Fc_pp;
+Fd_in(1:simulation_time) = Fd_pp;
 
-% Trajektorie wejść procesu
-T_H(1:simulation_time) = T_Hpp;
-T_C(1:simulation_time) = T_Cpp;
-T_D(1:simulation_time) = T_Dpp;
-F_H(1:simulation_time) = F_Hpp;
-F_Cin(1:simulation_time) = F_Cpp;
-F_Hin(1:simulation_time) = F_Hpp;
-F_D(1:simulation_time) = F_Dpp;
+h(1:simulation_time) = h_pp;
+T(1:simulation_time) = T_pp;
 
 T_zad(1:simulation_time) = T_pp;
 T_zad(start:start+round((simulation_time-start)/3)) = T_pp;
@@ -63,104 +62,95 @@ T_zad(start+round(2*(simulation_time-start)/3):simulation_time) = T_pp - 5;
 
 h_zad(1:simulation_time) = h_pp;
 h_zad(start:start+round((simulation_time-start)/3)) = h_pp;
-h_zad(round(start+(simulation_time-start)/3):start+round(2*(simulation_time-start)/3)) = h_pp + 2;
-h_zad(start+round(2*(simulation_time-start)/3):simulation_time) = h_pp - 2;
+h_zad(round(start+(simulation_time-start)/3):start+round(2*(simulation_time-start)/3)) = h_pp - 2;
+h_zad(start+round(2*(simulation_time-start)/3):simulation_time) = h_pp + 2;
 
-% Stan i wyjścia procesu przed rozpoczęciem symulacji
-F_H(1:simulation_time) = F_Hpp;
-F_C(1:simulation_time) = F_Cpp;
-h(1:simulation_time) = h_pp;
-T(1:simulation_time) = T_pp;
-
-e = 0;
-
-load("odp_skok_Tp10__minus.mat")
+% model
+load("odp_skok_Tp10.mat")
 S = odpowiedz_skokowa(:,:,1:D);
 [ny, nu, D] = size(S);
 
-lambda_mat = [lambda(1), 0; 0, lambda(2)];
-LAMBDA = kron(eye(Nu), lambda_mat);
-
-phi_mat = [phi(1), 0; 0, phi(2)];
-PHI = kron(eye(N), phi_mat);
-
-[M, MP] = DMCmatrices(S, N, Nu);
-% Sz = DMCstepmatricesZ(Tp, timefinal);
-% MzP = DMCmatrixMzP(Sz, N);
-
-K = (M'*PHI*M+LAMBDA)^(-1)*M'*PHI;
-
-DU_p = zeros((D-1)*nu, 1);
-for k=start:simulation_time
-    % disp(k)
-    %symulacja obiektu
-    % [F_C, V, VT, T, F, h, T_out] = obiekt(F_Cin, F_H, F_D, F_C, T_H, T_C, T_D, T_out, h, C, alpha, tau_C_steps, tau_steps, V, VT, T, F, Tp, k);
-    [h,T] = obiekt2(F_Cin,F_Hin, F_H, F_D, F_C, T_H, T_C, T_D, h, alpha, tau_C_steps, tau_H_steps, r, T, Tp, k);
-    % [h,T] = obiekt_dyskretny(h, T, Tp, k, F_Hin, F_Cin, F_D(k),r, T_H(k), T_C(k), T_D(k), tau_H, tau_C, alpha);
-    %Obliczenie DU_p
-    for d=1:(D-1)
-        DU_p(2*d-1) = F_Cin(k-d) - F_Cin(k-d-1);
-        DU_p(2*d) = F_H(k-d) - F_H(k-d-1);
-    end
-
-    %Pomiar wyjścia
-    Y = ones(N*ny, 1);
-    Y(1:2:end) = Y(1:2:end) * T(k);
-    Y(2:2:end) = Y(2:2:end) * h(k);
-
-    Y_zad = ones(N*ny, 1);
-    Y_zad(1:2:end) = Y_zad(1:2:end) * T_zad(k);
-    Y_zad(2:2:end) = Y_zad(2:2:end) * h_zad(k);
-
-    %Obliczenie sterowania
-    DU = K*(Y_zad-Y-MP*DU_p);
-
-    F_Cin(k) = F_Cin(k-1) + DU(1);
-
-    % if F_Cin(k) > F_Cpp*1.2
-    %     F_Cin(k) = F_Cpp*1.2;
-    % elseif F_Cin(k) < F_Cpp*0.8
-    %     F_Cin(k) = F_Cpp*0.8;
-    % end
-    % 
-    % F_H(k) = F_H(k-1) + DU(2);
-    % 
-    % if F_H(k) > F_Hpp*1.2
-    %     F_H(k) = F_Hpp*1.2;
-    % elseif F_H(k) < F_Hpp*0.8
-    %     F_H(k) = F_Hpp*0.8;
-    % end
-
-
-    e = e + (T_zad(k)-T(k))^2 + (h_zad(k)-h(k))^2; 
+%Macierz Lambda
+Lambda = eye(nu*Nu);
+for i = 1:Nu
+    Lambda(i*nu-1, i*nu-1) = lambda(1);
+    Lambda(i*nu, i*nu) = lambda(2);
 end
 
-e
+%Macierz Phi
+Phi = eye(ny*N);
+for i = 1:N
+    Phi(i*ny-1, i*ny-1) = phi(1);
+    Phi(i*ny, i*ny) = phi(2);
+end
 
-% figure(2)
+%Pobranie macierzy M, MP
+[M, MP] = DMCmatrices(S, N, Nu);
+
+K = (M'*Phi*M+Lambda)^(-1)*M'*Phi;
+DU_p = zeros((D-1)*nu, 1);
+
+for k=start:simulation_time
+    % disp(k)
+
+    Fd = Fd_pp;
+    [h,T] = obiekt(h, T, Fh_in, Fc_in, Fd, tau_h, tau_c, alpha, Tp, k, r);
+    
+
+
+    Y_zad = zeros(N*ny, 1);
+    Y_zad(1:2:end) = h_zad(k);
+    Y_zad(2:2:end) = T_zad(k);
+
+    Y = zeros(N*ny, 1);
+    Y(1:2:end) = h(k);
+    Y(2:2:end) = T(k);
+
+    for i=1:(D-1)
+        DU_p(i*nu-1) = Fh_in(k-i) - Fh_in(k-i-1);
+        DU_p(i*nu) = Fc_in(k-i) - Fc_in(k-i-1);
+    end
+
+
+    DU = K*(Y_zad-Y-MP*DU_p);
+    Fh_in(k) = Fh_in(k-1) + DU(1);
+    Fc_in(k) = Fc_in(k-1) + DU(2);
+
+    % ograniczenia
+    if Fc_in(k) > Fc_max
+        Fc_in(k) = Fc_max;
+    elseif Fc_in(k) < 0
+        Fc_in(k) = 0;
+    end
+
+    if Fh_in(k) > Fh_max
+        Fh_in(k) = Fh_max;
+    elseif Fh_in(k) < 0
+        Fh_in(k) = 0;
+    end
+
+    Error = Error + (T_zad(k)-T(k))^2 + (h_zad(k)-h(k))^2; 
+end
+disp(Error)
+
+% figure(1)
 % subplot(2,1,1)
 % hold on
-% stairs(h(1:end))
-% plot(h_zad(1:end))
-% stairs(T(1:end))
-% plot(T_zad(1:end))
-% title("Wyjście")
-% legend("Wyjście h", "h zadana", "Wyjscie T", "t zadana")
-% xlabel("chwila k")
-% ylabel("wartość wyjścia")
-% hold off
+% stairs(h)
+% stairs(h_zad)
+% title("Wyjście h")
+% legend("h", "h_zad")
+% xlabel("k")
+% ylabel("wyjście")
 % 
 % subplot(2,1,2)
 % hold on
-% stairs(F_Cin(1:end))
-% stairs(F_H(1:end))
-% legend("sterowanie Fc", "sterowanie Fh")
-% xlabel("chwila k")
-% ylabel("wartość sterowania")
-% title("Sterowanie")
-
-
-
+% stairs(T)
+% stairs(T_zad)
+% title("Wyjście T")
+% legend("T", "T\_zad")
+% xlabel("k")
+% ylabel("wyjście")
 
 end
 

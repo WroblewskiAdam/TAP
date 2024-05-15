@@ -43,6 +43,11 @@ Fd_in(1:simulation_time) = Fd_pp;
 h(1:simulation_time) = h_pp;
 T(1:simulation_time) = T_pp;
 
+
+Fd_in(simulation_time/2:6000) = Fd_pp*2;
+
+
+
 T_zad(1:simulation_time) = T_pp;
 T_zad(start:start+round((simulation_time-start)/3)) = T_pp;
 T_zad(round(start+(simulation_time-start)/3):start+round(2*(simulation_time-start)/3)) = T_pp + 5;
@@ -122,7 +127,7 @@ end
 disp(Error)
 
 figure(2)
-subplot(2,1,1)
+subplot(3,1,1)
 hold on
 stairs(Fh_in)
 title("Sterowanie Fh")
@@ -130,7 +135,7 @@ legend("Fh_in")
 xlabel("k")
 ylabel("sterowanie")
 
-subplot(2,1,2)
+subplot(3,1,2)
 hold on
 stairs(Fc_in)
 title("Sterowanie Fc")
@@ -138,6 +143,13 @@ legend("Fc_in")
 xlabel("k")
 ylabel("sterowanie")
 
+subplot(3,1,3)
+hold on
+stairs(Fd_in)
+title("Zakłócenie Fc")
+legend("Fd")
+xlabel("k")
+ylabel("zakłócenie")
 
 figure(1)
 subplot(2,1,1)
