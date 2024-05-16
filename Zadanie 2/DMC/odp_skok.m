@@ -18,7 +18,7 @@ alpha = 25;
 
 start = 221;
 Tp = 10; 
-Ts = 10000+start;
+Ts = 12200+start;
 steps = round(Ts/Tp);
 
 
@@ -51,7 +51,7 @@ for i = 1:2
     Fc_in = u2;
     
     for k = start:steps+start
-        [h,T] = obiekt(h, T, Fh_in, Fc_in, Fd, tau_h, tau_c,alpha, Tp, k, r);
+        [h,T] = obiekt(h, T, Fh_in, Fc_in, Fd, Td, tau_h, tau_c,alpha, Tp, k, r);
     end
     h_d = h;
     T_d = T;
@@ -75,25 +75,28 @@ for i = 1:2
     end
 end
 
-figure(1)   
+figure(1)
+subplot(2,2,1)
 grid on
 stairs( y1_skal_u1,'color','blue');
-title('y1 skok u1 ');
+title('Wyjście h, skok Fh');
 
-figure(2)   
+subplot(2,2,3)  
 grid on
 stairs( y2_skal_u1,'color','blue');
-title('y2 skok u1 ');
+title('Wyjście T, skok Fh');
 
-figure(3)   
+subplot(2,2,2)
 grid on
 stairs( y1_skal_u2,'color','blue');
-title('y1 skok u2 ');
+title('Wyjście h, skok Fc');
 
-figure(4)   
+subplot(2,2,4)
 grid on
 stairs( y2_skal_u2,'color','blue');
-title('y2 skok u2 ');
+title('Wyjście T, skok Fc');
+print("rysunki\odpowiedzi_skokowe","-dpng","-r800")
+
 
 
 for k = 1:length(y1_skal_u1)
@@ -104,5 +107,5 @@ for k = 1:length(y1_skal_u1)
                                 y2_skal_u1(k), y2_skal_u2(k)];
 end
 
-% save('odp_skok_Tp10.mat', 'odpowiedz_skokowa')
+save('odp_skok_Tp10_1.mat', 'odpowiedz_skokowa')
 
