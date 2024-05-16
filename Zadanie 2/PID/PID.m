@@ -96,62 +96,53 @@ r2_2 = Kd2 / Tp;
 % r1_2 = K2 * ((Tp/(2*Ti2)) - 2 * (Td2/Tp) - 1);
 % r2_2 = K2 * Td2 / Tp;
 
+% bez odsprzęgania
+% delta_max_Fc = 5;
+% delta_max_Fh = 3;
+
+
 for k = k_min:k_max
 
     [h_out, T_out] = obiekt_dyskretny_pid(Ts, h(1), T(1), Tp, Fd, Td);
 
     %% bez odsprzegania
 
-    e1(k) = T_zad(k) - T_out(k);
-    Fc_in(k) = Fc_in(k-1) + r0_1*e1(k) - r1_1*e1(k-1) + r2_1*e1(k-2);
-    if Fc_in(k) < 0
-        Fc_in(k) = 0;
-    end
-
-    e2(k) = h_zad(k) - h_out(k);
-    Fh_in(k) = Fh_in(k-1) + r0_2*e2(k) - r1_2*e2(k-1) + r2_2*e2(k-2);
-    if Fh_in(k) < 0
-        Fh_in(k) = 0;
-    end
-
-    e = e + (e1(k))^2 + (e2(k))^2;
-
-    %% z odsprzeganiem
-
     % e1(k) = T_zad(k) - T_out(k);
-    % Fc_in(k) = Fc_in(k-1) + r0_1*e1(k) - r1_1*e1(k-1) + r2_1*e1(k-2) - k_ht * e2(k);
-    % 
+    % Fc_in(k) = Fc_in(k-1) + r0_1*e1(k) - r1_1*e1(k-1) + r2_1*e1(k-2);
+    % Fc_in(k) = max(min(Fc_in(k), Fc_in(k-1) + delta_max_Fc), Fc_in(k-1) - delta_max_Fc);
     % if Fc_in(k) < 0
     %     Fc_in(k) = 0;
     % end
     % 
     % e2(k) = h_zad(k) - h_out(k);
-    % Fh_in(k) = Fh_in(k-1) + r0_2*e2(k) - r1_2*e2(k-1) + r2_2*e2(k-2) - k_th * e1(k);
-    % 
+    % Fh_in(k) = Fh_in(k-1) + r0_2*e2(k) - r1_2*e2(k-1) + r2_2*e2(k-2);
+    % Fh_in(k) = max(min(Fh_in(k), Fh_in(k-1) + delta_max_Fh), Fh_in(k-1) - delta_max_Fh);
     % if Fh_in(k) < 0
     %     Fh_in(k) = 0;
     % end
     % 
     % e = e + (e1(k))^2 + (e2(k))^2;
+
+    %% z odsprzeganiem
+
+    e1(k) = T_zad(k) - T_out(k);
+    Fc_in(k) = Fc_in(k-1) + r0_1*e1(k) - r1_1*e1(k-1) + r2_1*e1(k-2) - k_ht * e2(k);
+    % Fc_in(k) = max(min(Fc_in(k), Fc_in(k-1) + delta_max_Fc), Fc_in(k-1) - delta_max_Fc);
+
+    if Fc_in(k) < 0
+        Fc_in(k) = 0;
+    end
+
+    e2(k) = h_zad(k) - h_out(k);
+    Fh_in(k) = Fh_in(k-1) + r0_2*e2(k) - r1_2*e2(k-1) + r2_2*e2(k-2) - k_th * e1(k);
+    % Fh_in(k) = max(min(Fh_in(k), Fh_in(k-1) + delta_max_Fh), Fh_in(k-1) - delta_max_Fh);
+
+    if Fh_in(k) < 0
+        Fh_in(k) = 0;
+    end
+
+    e = e + (e1(k))^2 + (e2(k))^2;
 end
-
-% disp(e)
-
-% figure(1)
-% hold on
-% plot(T_out(k_min:k_max))
-% plot(T_zad(k_min:k_max))
-% plot(h_out(k_min:k_max))
-% plot(h_zad(k_min:k_max))
-% hold off
-% legend(["T_{out}", "Tzad", "h_{out}", "hzad"])
-% 
-% figure(2)
-% hold on
-% plot(Fc_in(k_min:k_max))
-% plot(Fh_in(k_min:k_max))
-% hold off
-% legend(["Fc_{in}", "Fh_{in}"])
 
 end
 
