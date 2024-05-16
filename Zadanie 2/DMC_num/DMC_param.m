@@ -1,10 +1,10 @@
 clear;
 load("odp_skok_Tp10.mat")
 
-D = 300;
-N = 100;
+D = 100;
+N = 50;
 Nu = 50;
-lambda = 70;
+lambda = 1;
 
 E = 0;
 
@@ -28,6 +28,9 @@ for i=1:D-1
    end
 end
 
-I = eye(nu*Nu);
 L = eye(nu*Nu)*lambda;
-J = tril(ones(nu*Nu));
+I = eye(nu);
+J = zeros(nu*Nu, nu*Nu);
+J(1:2:Nu*nu, 1:2:Nu*nu) = 1;
+J(2:2:Nu*nu, 2:2:Nu*nu) = 1;
+J = tril(J);
