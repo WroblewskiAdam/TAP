@@ -3,16 +3,17 @@ close all
 clc
 
 % parametry DMC
-D = 200;
-N = 200;
+D = 300;
+N = 100;
 Nu = 50;
-lambda = [50, 50];
+lambda = [70, 70];
 phi = [1, 1];
 
 % parametry symulacji 
+
 Tp = 10;
 start = D+1;
-simulation_time = 10000; 
+Ts = 10000;
 Error = 0;
 
 % Stałe
@@ -36,27 +37,25 @@ h_pp = 13.5424;
 T_pp = 38.0978;
 
 % trajektorie
-Fh_in(1:simulation_time) = Fh_pp;
-Fc_in(1:simulation_time) = Fc_pp;
-Fd_in(1:simulation_time) = Fd_pp;
+Fh_in(1:Ts) = Fh_pp;
+Fc_in(1:Ts) = Fc_pp;
+Fd_in(1:Ts) = Fd_pp;
+Td_in(1:Ts) = Td_pp;
 
-h(1:simulation_time) = h_pp;
-T(1:simulation_time) = T_pp;
-
-
-Fd_in(simulation_time/2:6000) = Fd_pp*2;
+h(1:Ts) = h_pp;
+T(1:Ts) = T_pp;
 
 
+Fd_in(Ts/2 : end) = Fd_pp*1.1;
+Td_in(Ts/2 :end) = Td_pp*1.1;
 
-T_zad(1:simulation_time) = T_pp;
-T_zad(start:start+round((simulation_time-start)/3)) = T_pp;
-T_zad(round(start+(simulation_time-start)/3):start+round(2*(simulation_time-start)/3)) = T_pp + 5;
-T_zad(start+round(2*(simulation_time-start)/3):simulation_time) = T_pp - 5;
+h_zad(1:round(Ts/3)) = h_pp;
+h_zad(round(Ts/3+1):round(2*Ts/3)) = h_pp + 2;
+h_zad(round(2*Ts/3+1):Ts) = h_pp - 2;
 
-h_zad(1:simulation_time) = h_pp;
-h_zad(start:start+round((simulation_time-start)/3)) = h_pp;
-h_zad(round(start+(simulation_time-start)/3):start+round(2*(simulation_time-start)/3)) = h_pp - 2;
-h_zad(start+round(2*(simulation_time-start)/3):simulation_time) = h_pp + 2;
+T_zad(1:round(Ts/3)) = T_pp;
+T_zad(round(Ts/3+1):round(2*Ts/3)) = T_pp + 5;
+T_zad(round(2*Ts/3+1):Ts) = T_pp - 5;
 
 % model
 load("odp_skok_Tp10.mat")
@@ -83,14 +82,11 @@ end
 K = (M'*Phi*M+Lambda)^(-1)*M'*Phi;
 DU_p = zeros((D-1)*nu, 1);
 
-for k=start:simulation_time
-    disp(k)
-
+for k=start:Ts
     Fd = Fd_in(k);
-    [h,T] = obiekt(h, T, Fh_in, Fc_in, Fd, tau_h, tau_c, alpha, Tp, k, r);
+    Td = Td_in(k);
+    [h,T] = obiekt(h, T, Fh_in, Fc_in, Fd, Td, tau_h, tau_c, alpha, Tp, k, r);
     
-
-
     Y_zad = zeros(N*ny, 1);
     Y_zad(1:2:end) = h_zad(k);
     Y_zad(2:2:end) = T_zad(k);
@@ -98,6 +94,7 @@ for k=start:simulation_time
     Y = zeros(N*ny, 1);
     Y(1:2:end) = h(k);
     Y(2:2:end) = T(k);
+
 
     for i=1:(D-1)
         DU_p(i*nu-1) = Fh_in(k-i) - Fh_in(k-i-1);
@@ -122,52 +119,72 @@ for k=start:simulation_time
         Fh_in(k) = 0;
     end
 
-    Error = Error + (T_zad(k)-T(k))^2 + (h_zad(k)-h(k))^2; 
+    Error = Error + (T_zad(k)-T(k))^2;
+    Error = Error + (h_zad(k)-h(k))^2;
 end
 disp(Error)
 
 figure(2)
-subplot(3,1,1)
+subplot(4,1,1)
 hold on
+grid on
 stairs(Fh_in)
 title("Sterowanie Fh")
-legend("Fh_in")
+legend("Fh\_in")
 xlabel("k")
-ylabel("sterowanie")
+ylabel("Fh")
 
-subplot(3,1,2)
+subplot(4,1,2)
 hold on
+grid on
 stairs(Fc_in)
 title("Sterowanie Fc")
-legend("Fc_in")
+legend("Fc\_in")
 xlabel("k")
-ylabel("sterowanie")
+ylabel("Fc")
 
-subplot(3,1,3)
+subplot(4,1,3)
 hold on
+grid on
 stairs(Fd_in)
-title("Zakłócenie Fc")
+title("Zakłócenie Fd")
 legend("Fd")
 xlabel("k")
-ylabel("zakłócenie")
+ylabel("Fd")
+
+subplot(4,1,4)
+hold on
+grid on
+stairs(Fd_in)
+title("Zakłócenie Td")
+legend("Td")
+xlabel("k")
+ylabel("Td")
+
+% print("rysunki\DMC_ster_best","-dpng","-r800")
+
 
 figure(1)
 subplot(2,1,1)
 hold on
+grid on
 stairs(h)
 stairs(h_zad)
 title("Wyjście h")
-legend("h", "h_zad")
+legend("h", "h\_zad")
 xlabel("k")
 ylabel("wyjście")
 
 subplot(2,1,2)
 hold on
+grid on
 stairs(T)
 stairs(T_zad)
 title("Wyjście T")
 legend("T", "T\_zad")
 xlabel("k")
 ylabel("wyjście")
+% print("rysunki\DMC_wyjscia_best","-dpng","-r800")
+
 
 

@@ -19,20 +19,25 @@ r = 68;
 dumax = 10;
 dumin = -10;
 umin = 0;
-umax = 60;
+u1max = 54;
+u2max = 100;
 ymin = 0;
 ymax = 60;
 
 dUmax = ones(nu*N)*dumax;
 dUmin = ones(nu*N)*dumin;
-Umin = ones(nu*Nu, 1)*umin;
-Umax = ones(nu*Nu, 1)*umax;
+Umin = zeros(nu*Nu, 1)*umin;
+
+Umax = zeros(nu*Nu, 1);
+Umax(1:2:end) = u1max;
+Umax(2:2:end) = u2max;  
+
 Ymin = ones(nu*N, 1)*ymin;
 Ymax = ones(nu*N, 1)*ymax;
 
 Fh0 = 27;
 Fc0 = 50;
-Fd = 15;
+Fd0 = 15;
 Th = 75;
 Tc = 17;
 Td = 42;
@@ -47,6 +52,8 @@ T(1:k_max) = T0;
 
 Fh_in(1:k_max) = Fh0;
 Fc_in(1:k_max) = Fc0;
+Fd_in(1:k_max/2) = Fd0;
+Fd_in(k_max/2+1:k_max) = Fd0*1.1;
 
 duk = 0;
 dUk = zeros(nu*(Nu-1), 1);
@@ -64,11 +71,14 @@ T_zad(1:D) = T0;
 T_zad(D+1:660) = T0+5;
 T_zad(661:1000) = T0-5;
 
+Error = 0;
+
 for k=D+1:k_max
    disp(k)
 
    Fh = Fh_in((k-tau_h));
    Fc = Fc_in((k-tau_c));
+   Fd = Fd_in(k);
 
    h(k) = h(k-1) + Tp * ((Fh + Fc + Fd - alpha*sqrt(h(k-1))) / (2*r*pi*h(k-1) - pi*h(k-1)^2));
    T(k) = T(k-1) + Tp* ((-T(k-1) * (Fh + Fc + Fd ) + Fh*Th + Fc*Tc + Fd*Td) / (pi*h(k-1)^2*r - pi*h(k-1)^3/3));
@@ -113,21 +123,50 @@ for k=D+1:k_max
   Fh_in(k) = Fh_in(k-1) + du1k;
   Fc_in(k) = Fc_in(k-1) + du2k;
 
+  Error = Error + (T_zad(k)-T(k))^2 + (h_zad(k)-h(k))^2; 
 end
+disp(Error)
+
+figure(2)
+subplot(3,1,1)
+hold on
+stairs(Fh_in)
+title("Sterowanie Fh")
+legend("Fh_in")
+xlabel("k")
+ylabel("sterowanie")
+
+subplot(3,1,2)
+hold on
+stairs(Fc_in)
+title("Sterowanie Fc")
+legend("Fc_in")
+xlabel("k")
+ylabel("sterowanie")
+
+subplot(3,1,3)
+hold on
+stairs(Fd_in)
+title("Zakłócenie Fd")
+legend("Fd")
+xlabel("k")
+ylabel("zakłócenie")
+
 figure(1)
 subplot(2,1,1)
-plot(h);hold on;
-grid on;
-stairs(h_zad,'--');
-title('DMC num, h');
-hold off
+hold on
+stairs(h)
+stairs(h_zad)
+title("Wyjście h")
+legend("h", "h\_zad")
+xlabel("k")
+ylabel("wyjście")
+
 subplot(2,1,2)
-plot(T);hold on;
-grid on;
-stairs(T_zad,'--');
-title("DMC num, T");
-hold off
-% subplot(2,1,2)
-% stairs(0:k, [F1in wyu]);
-% title('DMC num, U');
-% grid on;
+hold on
+stairs(T)
+stairs(T_zad)
+title("Wyjście T")
+legend("T", "T\_zad")
+xlabel("k")
+ylabel("wyjście")

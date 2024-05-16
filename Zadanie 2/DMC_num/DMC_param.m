@@ -4,7 +4,7 @@ load("odp_skok_Tp10.mat")
 D = 300;
 N = 100;
 Nu = 50;
-lambda = 1;
+lambda = 70;
 
 E = 0;
 
