@@ -37,17 +37,17 @@ eqn2_sym = (Fh0*Th + Fc0*Tc + Fd*Td - alpha*sqrt(h0)*T0 - T0*(Fh0 + Fc0 + Fd - a
         ((9*(h0-2*r) * (Fc0*(Tc - T0) + Fh0*(Th-T0) + Fd*(Td-T0))) / (pi*h0^3*(h0 - 3*r)^2)) * (h - h0);
 
 % % macierz jacobiego dla stanow
-% J_A = jacobian([eqn1_sym, eqn2_sym], [h, T]);
-% 
-% % macierz jacobiego dla wejsc
-% J_B = jacobian([eqn1_sym, eqn2_sym], [Fh, Fc]);
+J_A = jacobian([eqn1_sym, eqn2_sym], [h, T]);
+
+% macierz jacobiego dla wejsc
+J_B = jacobian([eqn1_sym, eqn2_sym], [Fh, Fc]);
 
 % podstawienie punktu pracy
-% A = double(subs(J_A, [h, T, Fh, Fc], [h_pp, T_pp, Fh_pp, Fc_pp]));
-% B = double(subs(J_B, [h, T, Fh, Fc], [h_pp, T_pp, Fh_pp, Fc_pp]));
+A = double(subs(J_A, [h, T, Fh, Fc], [h_pp, T_pp, Fh_pp, Fc_pp]));
+B = double(subs(J_B, [h, T, Fh, Fc], [h_pp, T_pp, Fh_pp, Fc_pp]));
 
-A = [- ((alpha*sqrt(h0)*(3*h0-2*r) - 4*(h0-r)*(Fc0+Fh0+Fd)) / (2*pi*h0^2*(h0-2*r)^2)) 0; ((9*(h0-2*r) * (Fc0*(Tc - T0) + Fh0*(Th-T0) + Fd*(Td-T0))) / (pi*h0^3*(h0 - 3*r)^2)) (3*(Fc0 + Fh0 + Fd) / (pi*h0^2*(h0-3*r)))];
-B = [(1/(2*pi*r*h0 - pi*h0^2)) (1/(2*pi*r*h0 - pi*h0^2)); (3*(T0 - Th) / (pi*h0^2*(h0-3*r))) (3*(T0 - Tc) / (pi*h0^2*(h0-3*r)))];
+% A = [- ((alpha*sqrt(h0)*(3*h0-2*r) - 4*(h0-r)*(Fc0+Fh0+Fd)) / (2*pi*h0^2*(h0-2*r)^2)) 0; ((9*(h0-2*r) * (Fc0*(Tc - T0) + Fh0*(Th-T0) + Fd*(Td-T0))) / (pi*h0^3*(h0 - 3*r)^2)) (3*(Fc0 + Fh0 + Fd) / (pi*h0^2*(h0-3*r)))];
+% B = [(1/(2*pi*r*h0 - pi*h0^2)) (1/(2*pi*r*h0 - pi*h0^2)); (3*(T0 - Th) / (pi*h0^2*(h0-3*r))) (3*(T0 - Tc) / (pi*h0^2*(h0-3*r)))];
 C = eye(2);
 D = zeros(2, 2);
 

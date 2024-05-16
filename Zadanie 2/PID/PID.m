@@ -1,4 +1,4 @@
-function [e, T_out, h_out, T_zad, h_zad, Fc_in, Fh_in] = PID(p)
+function [e, T_out, h_out, T_zad, h_zad, Fc_in, Fh_in, Fd_in, Td_in] = PID(p)
 % function [e] = PID(p)
 % aby uzyc PID_optymalizacja zamienic na function [e] = PID(p)
 
@@ -37,18 +37,20 @@ T_pp = 38.0978;
 r = 68;
 alpha = 25;
 
-Ts = 8000;
+Ts = 10000;
 Tp = 10;
 steps = round(Ts / Tp);
 tau_c_steps = round(170 / Tp);
 tau_h_steps = round(220 / Tp);
 
 k_min = 1 + max(tau_c_steps, tau_h_steps);
-k_max = steps;  
+k_max = steps + 22;  
 
 % warunki poczatkowe
-Fc_in = Fc * ones(1, k_max + tau_c_steps);
-Fh_in = Fh * ones(1, k_max + tau_h_steps);
+Fc_in = Fc * ones(1, k_max);
+Fh_in = Fh * ones(1, k_max);
+Fd_in = Fd_pp * ones(1, k_max);
+Td_in = Td_pp * ones(1, k_max);
 
 h = h_pp * ones(1, k_max);
 T = T_pp * ones(1, k_max);
@@ -63,11 +65,14 @@ T_zad(1:round(k_max/3)) = T_pp;
 T_zad(round(k_max/3+1):round(2*k_max/3)) = T_pp + 5;
 T_zad(round(2*k_max/3+1):k_max) = T_pp - 5;
 
+Fd_in(k_max/2:k_max) = Fd_pp * 1.1;
+Td_in(k_max/2:k_max) = Td_pp * 1.1;
+
 % k_ht = -0.1;  % wplyw T na h
 % k_th = -0.054; % wplyw h na T 
 
 k_ht = -0.1;  % wplyw T na h
-k_th = -0.054; % wplyw h na T 
+k_th = -0.04; % wplyw h na T 
 
 e1(1:k_max) = 0;
 e2(1:k_max) = 0;
@@ -93,55 +98,41 @@ r2_2 = Kd2 / Tp;
 
 for k = k_min:k_max
 
-    if k < round(k_max/3)
-        Fd = Fd_pp;
-        Td = Td_pp;
-    end
-
-    if k > round(k_max/3)-1 && k < round(2*k_max/3)
-       Fd = Fd_pp - 0.1 * Fd_pp;
-       Td = Td_pp + 0.1 * Td_pp;
-    end
-
-    if k > round(2*k_max/3)-1
-       Fd = Fd_pp + 0.1 * Fd_pp ;
-       Td = Td_pp - 0.1 * Td_pp;
-    end
-
     [h_out, T_out] = obiekt_dyskretny_pid(Ts, h(1), T(1), Tp, Fd, Td);
 
     %% bez odsprzegania
 
-    % e1(k) = T_zad(k) - T_out(k-1);
-    % Fc_in(k) = Fc_in(k-1) + r0_1*e1(k) - r1_1*e1(k-1) + r2_1*e1(k-2);
-    % if Fc_in(k) < 0
-    %     Fc_in(k) = 0;
-    % end
-    % 
-    % e2(k) = h_zad(k) - h_out(k-1);
-    % Fh_in(k) = Fh_in(k-1) + r0_2*e2(k) - r1_2*e2(k-1) + r2_2*e2(k-2);
-    % if Fh_in(k) < 0
-    %     Fh_in(k) = 0;
-    % end
-    % 
-    % e = e + abs(e1(k))^2 + abs(e2(k))^2;
-
-    %% z odsprzeganiem
-
-    e1(k) = T_zad(k) - T_out(k-1);
-    Fc_in(k) = Fc_in(k-1) + r0_1*e1(k) - r1_1*e1(k-1) + r2_1*e1(k-2) - k_ht * e2(k);
-
+    e1(k) = T_zad(k) - T_out(k);
+    Fc_in(k) = Fc_in(k-1) + r0_1*e1(k) - r1_1*e1(k-1) + r2_1*e1(k-2);
     if Fc_in(k) < 0
         Fc_in(k) = 0;
     end
 
-    e2(k) = h_zad(k) - h_out(k-1);
-    Fh_in(k) = Fh_in(k-1) + r0_2*e2(k) - r1_2*e2(k-1) + r2_2*e2(k-2) - k_th * e1(k);
+    e2(k) = h_zad(k) - h_out(k);
+    Fh_in(k) = Fh_in(k-1) + r0_2*e2(k) - r1_2*e2(k-1) + r2_2*e2(k-2);
     if Fh_in(k) < 0
         Fh_in(k) = 0;
     end
 
-    e = e + abs(e1(k)) + abs(e2(k));
+    e = e + (e1(k))^2 + (e2(k))^2;
+
+    %% z odsprzeganiem
+
+    % e1(k) = T_zad(k) - T_out(k);
+    % Fc_in(k) = Fc_in(k-1) + r0_1*e1(k) - r1_1*e1(k-1) + r2_1*e1(k-2) - k_ht * e2(k);
+    % 
+    % if Fc_in(k) < 0
+    %     Fc_in(k) = 0;
+    % end
+    % 
+    % e2(k) = h_zad(k) - h_out(k);
+    % Fh_in(k) = Fh_in(k-1) + r0_2*e2(k) - r1_2*e2(k-1) + r2_2*e2(k-2) - k_th * e1(k);
+    % 
+    % if Fh_in(k) < 0
+    %     Fh_in(k) = 0;
+    % end
+    % 
+    % e = e + (e1(k))^2 + (e2(k))^2;
 end
 
 % disp(e)

@@ -3,13 +3,13 @@
 % clc;
 
 % dolne ograniczenia
-lb = [-10, -10, -10, -10, -10, -10];
+lb = [-5, -5, -5, -5, -5, -5];
 
 % gorne ograniczenia
-ub = [10, 10, 10, 10, 10, 10];
+ub = [5, 5, 5, 5, 5, 5];
 
 % poczatkowe parametry
-start_params = [1, 0, 1, 1, 0, 1];
+start_params = [-1, 1, 1, 1, 1, 1];
 
 optimal_params_PID = fmincon(@PID, start_params, [], [], [], [], lb, ub);
 disp(optimal_params_PID)

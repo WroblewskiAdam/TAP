@@ -16,7 +16,7 @@ T0 = T_pp;
 Fh0 = 27;
 Fc0 = 50;
 
-for k = 2:steps+2
+for k = 2:steps+22
 
     if k - tau_h_steps < 1
        Fh = Fh_in(1);

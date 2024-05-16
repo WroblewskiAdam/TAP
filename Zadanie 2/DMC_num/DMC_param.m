@@ -1,53 +1,32 @@
 clear;
-load("odpowiedzi_skokowe_Tp25.mat")
+load("odp_skok_Tp10.mat")
 
 D = 300;
-N = 300; Nu = 10; lambda = 5;
-
-nu = 2 ; % l wejść
-ny = 2; % l wyjść
+N = 100;
+Nu = 50;
+lambda = 70;
 
 E = 0;
 
-s = odpowiedzi;
+S = odpowiedz_skokowa(:,:,1:D);
 
-S = cell(1, D);
-for i=1:D
-    S_temp = zeros(ny, nu);
-    for y=1:ny
-        for u=1:nu
-            S_temp(y, u) = s{y}{u}(i);
-        end
-    end
-    S{i} = S_temp;
-end
+[ny, nu, D] = size(S);
     
-M = cell(ny*N, nu*Nu);
-for row =1:N
-    for column = 1:Nu
-        SS = zeros(ny,nu);
-        if row - column + 1 > 1
-            SS = S{row - column + 1};
-            M{row,column} = SS;
-        else
-            M{row,column} = SS;
-        end
-    end
+M=zeros(N*ny, Nu*nu);
+for i=1:N
+   M((i-1)*ny+1:(i-1)*ny+ny, 1:nu) = S(:, :,min(i, D)); 
 end
-
-M = cell2mat(M);
-
-Mp = cell(ny*N, nu*(D-1));
-for column=1:(D-1)
-    for row=1:N
-        if row + column > D
-            Mp{row, column} = S{D} - S{D-1};
-        else
-            Mp{row, column} = S{row + column} - S{column};
-        end
-    end
+for i=2:Nu
+   M(:, (i-1)*nu+1:(i-1)*nu+nu) = [zeros((i-1)*ny, nu); M(1:(N-i+1)*ny,1:nu)];
 end
-Mp = cell2mat(Mp);
+ 
+Mp=zeros(ny*N, nu*(D-1));
+  
+for i=1:D-1
+   for j=1:N
+      Mp((j-1)*ny+1:j*ny,(i-1)*nu+1:i*nu)=S(:,:,min(i+j,D))-S(:,:,i);
+   end
+end
 
 I = eye(nu*Nu);
 L = eye(nu*Nu)*lambda;

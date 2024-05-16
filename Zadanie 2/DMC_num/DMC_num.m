@@ -19,20 +19,25 @@ r = 68;
 dumax = 10;
 dumin = -10;
 umin = 0;
-umax = 200;
+u1max = 54;
+u2max = 100;
 ymin = 0;
-ymax = 50;
+ymax = 60;
 
 dUmax = ones(nu*N)*dumax;
 dUmin = ones(nu*N)*dumin;
-Umin = ones(nu*Nu, 1)*umin;
-Umax = ones(nu*Nu, 1)*umax;
+Umin = zeros(nu*Nu, 1)*umin;
+
+Umax = zeros(nu*Nu, 1);
+Umax(1:2:end) = u1max;
+Umax(2:2:end) = u2max;  
+
 Ymin = ones(nu*N, 1)*ymin;
 Ymax = ones(nu*N, 1)*ymax;
 
 Fh0 = 27;
 Fc0 = 50;
-Fd = 15;
+Fd0 = 15;
 Th = 75;
 Tc = 17;
 Td = 42;
@@ -45,8 +50,10 @@ Fc = Fc0;
 h(1:k_max) = h0;
 T(1:k_max) = T0;
 
-u1(1:k_max) = Fh0;
-u2(1:k_max) = Fc0;
+Fh_in(1:k_max) = Fh0;
+Fc_in(1:k_max) = Fc0;
+Fd_in(1:k_max/2) = Fd0;
+Fd_in(k_max/2+1:k_max) = Fd0*1.1;
 
 duk = 0;
 dUk = zeros(nu*(Nu-1), 1);
@@ -55,48 +62,48 @@ dUp = zeros(nu*(D-1), 1);
 
 % Yzad
 h_zad = zeros(1, k_max);
-h_zad(1:330) = 20;
-h_zad(331:660) = 10;
-h_zad(661:1000) = 17;
+h_zad(1:D) = h0;
+h_zad(D+1:660) = h0+2;
+h_zad(661:1000) = h0-2;
 
 T_zad = zeros(1, k_max);
-T_zad(1:330) = 30;
-T_zad(331:660) = 40;
-T_zad(661:1000) = 50;
-% --- %
-T_zad(1: k_max) = T0;
+T_zad(1:D) = T0;
+T_zad(D+1:660) = T0+5;
+T_zad(661:1000) = T0-5;
 
-for k=(tau_h+1):k_max
+Error = 0;
 
-   Fh = u1((k-tau_h));
-   Fc = u2((k-tau_c));
+for k=D+1:k_max
+   disp(k)
 
-   h(k) = h(k-1) + Tp * ((Fh0 +Fc0 + Fd - alpha*sqrt(h0)) / (2*pi*r*h0 - pi*h0^2) - ...
-             ((alpha*sqrt(h0)*(3*h0-2*r) - 4*(h0-r)*(Fc0+Fh0+Fd)) / (2*pi*h0^2*(h0-2*r)^2)) * (h(k-1)-h0) + ...
-             (1/(2*pi*r*h0 - pi*h0^2))*(Fh - Fh0) + ...
-             (1/(2*pi*r*h0 - pi*h0^2))*(Fc - Fc0));
-    
-    
-   T(k) = T(k-1) + Tp * ((Fh0*Th + Fc0*Tc + Fd*Td - alpha*sqrt(h0)*T0 - T0*(Fh0 + Fc0 + Fd - alpha*sqrt(h0))) / (pi*h0^2*r - (pi*h0^3)/3) + ...
-            (3*(Fc0 + Fh0 + Fd) / (pi*h0^2*(h0-3*r))) * (T(k-1) - T0) + ...
-            (3*(T0 - Th) / (pi*h0^2*(h0-3*r))) * (Fh - Fh0) + ...
-            (3*(T0 - Tc) / (pi*h0^2*(h0-3*r))) * (Fc - Fc0) + ...
-            ((9*(h0-2*r) * (Fc0*(Tc - T0) + Fh0*(Th-T0) + Fd*(Td-T0))) / (pi*h0^3*(h0 - 3*r)^2)) * (h(k-1) - h0));
+   Fh = Fh_in((k-tau_h));
+   Fc = Fc_in((k-tau_c));
+   Fd = Fd_in(k);
 
-   for n=D-1:-1:2 
-      dUp(n)=dUp(n-1);
-   end
-   dUp(1)=duk;
+   h(k) = h(k-1) + Tp * ((Fh + Fc + Fd - alpha*sqrt(h(k-1))) / (2*r*pi*h(k-1) - pi*h(k-1)^2));
+   T(k) = T(k-1) + Tp* ((-T(k-1) * (Fh + Fc + Fd ) + Fh*Th + Fc*Tc + Fd*Td) / (pi*h(k-1)^2*r - pi*h(k-1)^3/3));
+ 
+    for i=1:(D-1)
+        dUp(i*nu-1) = Fh_in(k-i) - Fh_in(k-i-1);
+        dUp(i*nu) = Fc_in(k-i) - Fc_in(k-i-1);
+    end
 
 % programowanie kwadratowe
 
-   Uk = [ones(Nu, 1)*u1(k-1); ones(Nu, 1)*u2(k-1)];
+   Uk = zeros(Nu*ny, 1);
+   Uk(1:2:end) = Fh_in(k-1);
+   Uk(2:2:end) = Fc_in(k-1);
 
-   Yk = [ones(N, 1)*h(k-1); ones(N, 1)*T(k-1)];
+   Yk = zeros(N*ny, 1);
+   Yk(1:2:end) = h(k);
+   Yk(2:2:end) = T(k);
+
    Y0kpom = Mp*dUp;
    Y0k = Yk + Y0kpom;
 
-   Yzad = [h_zad(k)*ones(N, 1); T_zad(k)*ones(N, 1)];
+   Yzad = zeros(N*ny, 1);
+   Yzad(1:2:end) = h_zad(k);
+   Yzad(2:2:end) = T_zad(k);
 
    H = 2*(M'*M + L);
    A = [-J; J; -M; M];
@@ -111,26 +118,55 @@ for k=(tau_h+1):k_max
   [dUk, fval] = quadprog(H,f,A,b, [], [], lb, ub);
 
   du1k = dUk(1);
-  du2k = dUk(1+Nu);
+  du2k = dUk(2);
    
-  u1(k) = u1(k-1) + du1k;
-  u2(k) = u2(k-1) + du2k;
+  Fh_in(k) = Fh_in(k-1) + du1k;
+  Fc_in(k) = Fc_in(k-1) + du2k;
 
+  Error = Error + (T_zad(k)-T(k))^2 + (h_zad(k)-h(k))^2; 
 end
+disp(Error)
+
+figure(2)
+subplot(3,1,1)
+hold on
+stairs(Fh_in)
+title("Sterowanie Fh")
+legend("Fh_in")
+xlabel("k")
+ylabel("sterowanie")
+
+subplot(3,1,2)
+hold on
+stairs(Fc_in)
+title("Sterowanie Fc")
+legend("Fc_in")
+xlabel("k")
+ylabel("sterowanie")
+
+subplot(3,1,3)
+hold on
+stairs(Fd_in)
+title("Zakłócenie Fd")
+legend("Fd")
+xlabel("k")
+ylabel("zakłócenie")
+
 figure(1)
 subplot(2,1,1)
-plot(h);hold on;
-grid on;
-stairs(h_zad,'--');
-title('DMC num, h');
-hold off
+hold on
+stairs(h)
+stairs(h_zad)
+title("Wyjście h")
+legend("h", "h\_zad")
+xlabel("k")
+ylabel("wyjście")
+
 subplot(2,1,2)
-plot(T);hold on;
-grid on;
-stairs(T_zad,'--');
-title("DMC num, T");
-hold off
-% subplot(2,1,2)
-% stairs(0:k, [F1in wyu]);
-% title('DMC num, U');
-% grid on;
+hold on
+stairs(T)
+stairs(T_zad)
+title("Wyjście T")
+legend("T", "T\_zad")
+xlabel("k")
+ylabel("wyjście")
