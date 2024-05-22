@@ -4,7 +4,6 @@ function [X] = f_ciagla(t, X)
     h = X(1,:);
     T = X(2,:);
 
-    
     %opóźnienie
     if floor(t) - tau_h < 1
 		Fh = Fh_in(1);
